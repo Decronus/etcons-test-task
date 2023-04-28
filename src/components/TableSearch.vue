@@ -6,11 +6,11 @@
             <DataTable
                 ref="dt"
                 :value="fetchedData"
-                v-model:selection="selectedProducts"
                 dataKey="id"
                 :paginator="true"
                 :rows="10"
                 :filters="filters"
+                :globalFilterFields="globalFilterFields"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                 :rowsPerPageOptions="[5, 10, 25]"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
@@ -18,17 +18,31 @@
                 <template #header>
                     <div class="flex gap-1 flex-row align-items-center justify-content-between">
                         <div class="search-content">
-                            <div class="p-inputgroup flex-1" style="width: 80%">
-                                <Button icon="pi pi-sliders-v" severity="success" />
-                                <InputText v-model="filters['global'].value" placeholder="Поиск" />
-                                <Button label="Search" />
+                            <div class="p-inputgroup flex-1" style="width: 80%; position: relative">
+                                <Button icon="pi pi-sliders-v" severity="success" @click="$refs.select.show()" />
+                                <MultiSelect
+                                    v-model="selectedColumns"
+                                    :options="columns"
+                                    optionLabel="name"
+                                    style="width: 20%; position: absolute"
+                                    id="hidden-trigger"
+                                    ref="select"
+                                />
+
+                                <InputText
+                                    @input="(event) => (searchValue = event.target.value)"
+                                    :value="searchValue"
+                                    placeholder="Поиск"
+                                    @keyup.enter="onSearchClick"
+                                />
+                                <Button label="Search" @click="onSearchClick" />
                             </div>
+
                             <MultiSelect
                                 v-model="selectedColumns"
                                 :options="columns"
                                 optionLabel="name"
                                 placeholder="Поля таблицы"
-                                :maxSelectedLabels="3"
                                 style="width: 20%"
                             />
                         </div>
@@ -64,6 +78,7 @@ import Column from "primevue/column";
 import Button from "primevue/button";
 import { FilterMatchMode } from "primevue/api";
 import Queries from "../services/queries.service";
+import { ref } from "vue";
 
 export default {
     name: "table-search",
@@ -90,6 +105,8 @@ export default {
             columns: [],
             selectedColumns: [],
             filters: {},
+            searchValue: "",
+            showDropdown: false,
         };
     },
 
@@ -99,11 +116,22 @@ export default {
                 global: { value: null, matchMode: FilterMatchMode.CONTAINS },
             };
         },
+        onSearchClick() {
+            this.filters.global.value = this.searchValue;
+        },
     },
 
-    watch: {
-        filters() {
-            console.log(this.filters);
+    computed: {
+        globalFilterFields() {
+            if (!this.selectedColumns.length) {
+                return null;
+            } else {
+                const fields = [];
+                for (let el of this.selectedColumns) {
+                    fields.push(el.name);
+                }
+                return fields;
+            }
         },
     },
 
@@ -128,5 +156,9 @@ export default {
     display: flex;
     justify-content: space-between;
     gap: 10px;
+}
+
+.p-multiselect#hidden-trigger {
+    visibility: hidden;
 }
 </style>
