@@ -15,6 +15,7 @@
                 :rowsPerPageOptions="[5, 10, 25]"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
             >
+                <template #empty> Ничего не найдено, попробуйте изменить поисковые фильтры.</template>
                 <template #header>
                     <div class="flex gap-1 flex-row align-items-center justify-content-between">
                         <div class="search-content">
@@ -35,7 +36,13 @@
                                     :value="searchValue"
                                     placeholder="Поиск"
                                     @keyup.enter="onSearchClick"
+                                    class="search-input"
                                 />
+                                <i
+                                    class="pi pi-times clear-search-icon"
+                                    v-if="searchValue"
+                                    @click="searchValue = ''"
+                                ></i>
                                 <Button label="Search" @click="onSearchClick" />
                             </div>
 
@@ -62,12 +69,12 @@
 </template>
 
 <script>
+import { FilterMatchMode } from "primevue/api";
 import DataTable from "primevue/datatable";
 import InputText from "primevue/inputtext";
 import MultiSelect from "primevue/multiselect";
 import Column from "primevue/column";
 import Button from "primevue/button";
-import { FilterMatchMode } from "primevue/api";
 import Queries from "../services/queries.service";
 
 export default {
@@ -149,6 +156,14 @@ export default {
     display: flex;
     justify-content: space-between;
     gap: 10px;
+}
+
+.clear-search-icon {
+    position: absolute;
+    right: 106px;
+    top: 14px;
+    opacity: 0.5;
+    z-index: 10;
 }
 
 .p-multiselect#hidden-trigger {
