@@ -16,182 +16,40 @@
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
             >
                 <template #header>
-                    <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
-                        <div class="p-inputgroup flex-1" style="width: 80%">
-                            <Button icon="pi pi-sliders-v" severity="success" />
-                            <InputText v-model="filters['global'].value" placeholder="Поиск" />
-                            <Button label="Search" />
+                    <div class="flex gap-1 flex-row align-items-center justify-content-between">
+                        <div class="search-content">
+                            <div class="p-inputgroup flex-1" style="width: 80%">
+                                <Button icon="pi pi-sliders-v" severity="success" />
+                                <InputText v-model="filters['global'].value" placeholder="Поиск" />
+                                <Button label="Search" />
+                            </div>
+                            <MultiSelect
+                                v-model="selectedColumns"
+                                :options="columns"
+                                optionLabel="name"
+                                placeholder="Поля таблицы"
+                                :maxSelectedLabels="3"
+                                style="width: 20%"
+                            />
                         </div>
                     </div>
                 </template>
 
-                <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
-                <Column field="code" header="Code" sortable style="min-width: 12rem"></Column>
-                <Column field="name" header="Name" sortable style="min-width: 16rem"></Column>
-                <Column header="Image">
-                    <template #body="slotProps">
-                        <img
-                            :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.image}`"
-                            :alt="slotProps.data.image"
-                            class="shadow-2 border-round"
-                            style="width: 64px"
-                        />
-                    </template>
+                <!-- <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column> -->
+                <!-- <Column field="code" header="Code" sortable style="min-width: 12rem"></Column>
+                <Column field="name" header="Name" sortable style="min-width: 16rem"></Column> -->
+                <Column
+                    v-for="(el, index) in !selectedColumns.length ? columns : selectedColumns"
+                    :key="index"
+                    :field="el.name"
+                    :header="el.code"
+                    sortable
+                    style="min-width: 8rem"
+                >
                 </Column>
-                <Column field="price" header="Price" sortable style="min-width: 8rem">
-                    <template #body="slotProps">
-                        {{ formatCurrency(slotProps.data.price) }}
-                    </template>
-                </Column>
-                <Column field="category" header="Category" sortable style="min-width: 10rem"></Column>
-                <Column field="rating" header="Reviews" sortable style="min-width: 12rem">
-                    <template #body="slotProps">
-                        <Rating :modelValue="slotProps.data.rating" :readonly="true" :cancel="false" />
-                    </template>
-                </Column>
-                <Column field="inventoryStatus" header="Status" sortable style="min-width: 12rem">
-                    <template #body="slotProps">
-                        <Tag
-                            :value="slotProps.data.inventoryStatus"
-                            :severity="getStatusLabel(slotProps.data.inventoryStatus)"
-                        />
-                    </template>
-                </Column>
-                <Column :exportable="false" style="min-width: 8rem">
-                    <template #body="slotProps">
-                        <Button
-                            icon="pi pi-pencil"
-                            outlined
-                            rounded
-                            class="mr-2"
-                            @click="editProduct(slotProps.data)"
-                        />
-                        <Button
-                            icon="pi pi-trash"
-                            outlined
-                            rounded
-                            severity="danger"
-                            @click="confirmDeleteProduct(slotProps.data)"
-                        />
-                    </template>
-                </Column>
+                <!-- <Column field="category" header="Category" sortable style="min-width: 10rem"></Column> -->
             </DataTable>
         </div>
-
-        <Dialog
-            v-model:visible="productDialog"
-            :style="{ width: '450px' }"
-            header="Product Details"
-            :modal="true"
-            class="p-fluid"
-        >
-            <img
-                v-if="product.image"
-                :src="`https://primefaces.org/cdn/primevue/images/product/${product.image}`"
-                :alt="product.image"
-                class="block m-auto pb-3"
-            />
-            <div class="field">
-                <label for="name">Name</label>
-                <InputText
-                    id="name"
-                    v-model.trim="product.name"
-                    required="true"
-                    autofocus
-                    :class="{ 'p-invalid': submitted && !product.name }"
-                />
-                <small class="p-error" v-if="submitted && !product.name">Name is required.</small>
-            </div>
-            <div class="field">
-                <label for="description">Description</label>
-                <Textarea id="description" v-model="product.description" required="true" rows="3" cols="20" />
-            </div>
-
-            <div class="field">
-                <label for="inventoryStatus" class="mb-3">Inventory Status</label>
-                <Dropdown
-                    id="inventoryStatus"
-                    v-model="product.inventoryStatus"
-                    :options="statuses"
-                    optionLabel="label"
-                    placeholder="Select a Status"
-                >
-                    <template #value="slotProps">
-                        <div v-if="slotProps.value && slotProps.value.value">
-                            <Tag :value="slotProps.value.value" :severity="getStatusLabel(slotProps.value.label)" />
-                        </div>
-                        <div v-else-if="slotProps.value && !slotProps.value.value">
-                            <Tag :value="slotProps.value" :severity="getStatusLabel(slotProps.value)" />
-                        </div>
-                        <span v-else>
-                            {{ slotProps.placeholder }}
-                        </span>
-                    </template>
-                </Dropdown>
-            </div>
-
-            <div class="field">
-                <label class="mb-3">Category</label>
-                <div class="formgrid grid">
-                    <div class="field-radiobutton col-6">
-                        <RadioButton id="category1" name="category" value="Accessories" v-model="product.category" />
-                        <label for="category1">Accessories</label>
-                    </div>
-                    <div class="field-radiobutton col-6">
-                        <RadioButton id="category2" name="category" value="Clothing" v-model="product.category" />
-                        <label for="category2">Clothing</label>
-                    </div>
-                    <div class="field-radiobutton col-6">
-                        <RadioButton id="category3" name="category" value="Electronics" v-model="product.category" />
-                        <label for="category3">Electronics</label>
-                    </div>
-                    <div class="field-radiobutton col-6">
-                        <RadioButton id="category4" name="category" value="Fitness" v-model="product.category" />
-                        <label for="category4">Fitness</label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="formgrid grid">
-                <div class="field col">
-                    <label for="price">Price</label>
-                    <InputNumber id="price" v-model="product.price" mode="currency" currency="USD" locale="en-US" />
-                </div>
-                <div class="field col">
-                    <label for="quantity">Quantity</label>
-                    <InputNumber id="quantity" v-model="product.quantity" integeronly />
-                </div>
-            </div>
-            <template #footer>
-                <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
-                <Button label="Save" icon="pi pi-check" text @click="saveProduct" />
-            </template>
-        </Dialog>
-
-        <Dialog v-model:visible="deleteProductDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-            <div class="confirmation-content">
-                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                <span v-if="product"
-                    >Are you sure you want to delete <b>{{ product.name }}</b
-                    >?</span
-                >
-            </div>
-            <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deleteProductDialog = false" />
-                <Button label="Yes" icon="pi pi-check" text @click="deleteProduct" />
-            </template>
-        </Dialog>
-
-        <Dialog v-model:visible="deleteProductsDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-            <div class="confirmation-content">
-                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                <span v-if="product">Are you sure you want to delete the selected products?</span>
-            </div>
-            <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deleteProductsDialog = false" />
-                <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedProducts" />
-            </template>
-        </Dialog>
     </div>
 </template>
 
@@ -205,11 +63,13 @@ import FileUpload from "primevue/fileupload";
 import Rating from "primevue/rating";
 import Dropdown from "primevue/dropdown";
 import RadioButton from "primevue/radiobutton";
+import MultiSelect from "primevue/multiselect";
 import Dialog from "primevue/dialog";
 import Tag from "primevue/tag";
 import Column from "primevue/column";
 import Button from "primevue/button";
 import { FilterMatchMode } from "primevue/api";
+import Queries from "../services/queries.service";
 
 export default {
     name: "table-search",
@@ -227,16 +87,13 @@ export default {
         InputNumber,
         RadioButton,
         Dialog,
+        MultiSelect,
     },
 
     data() {
         return {
-            products: null,
-            productDialog: false,
-            deleteProductDialog: false,
-            deleteProductsDialog: false,
-            product: {},
-            selectedProducts: null,
+            columns: [],
+            selectedColumns: [],
             filters: {},
             submitted: false,
             statuses: [
@@ -249,7 +106,11 @@ export default {
 
     methods: {
         formatCurrency(value) {
-            if (value) return value.toLocaleString("en-US", { style: "currency", currency: "USD" });
+            if (value)
+                return value.toLocaleString("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                });
             return;
         },
         openNew() {
@@ -308,7 +169,12 @@ export default {
             this.products = this.products.filter((val) => val.id !== this.product.id);
             this.deleteProductDialog = false;
             this.product = {};
-            this.$toast.add({ severity: "success", summary: "Successful", detail: "Product Deleted", life: 3000 });
+            this.$toast.add({
+                severity: "success",
+                summary: "Successful",
+                detail: "Product Deleted",
+                life: 3000,
+            });
         },
         findIndexById(id) {
             let index = -1;
@@ -339,7 +205,12 @@ export default {
             this.products = this.products.filter((val) => !this.selectedProducts.includes(val));
             this.deleteProductsDialog = false;
             this.selectedProducts = null;
-            this.$toast.add({ severity: "success", summary: "Successful", detail: "Products Deleted", life: 3000 });
+            this.$toast.add({
+                severity: "success",
+                summary: "Successful",
+                detail: "Products Deleted",
+                life: 3000,
+            });
         },
         initFilters() {
             this.filters = {
@@ -363,14 +234,31 @@ export default {
         },
     },
 
+    watch: {
+        selectedColumns() {
+            console.log(this.selectedColumns);
+        },
+    },
+
     created() {
         this.initFilters();
     },
 
-    mounted() {
-        // CustomerService.getCustomersSmall().then((data) => (this.customers = data));
+    async mounted() {
+        const comments = await Queries.getComments();
+        const keys = Object.keys(comments.data[0]);
+        for (let key of keys) {
+            const column = { name: key, code: key.toLocaleUpperCase() };
+            this.columns.push(column);
+        }
     },
 };
 </script>
 
-<style></style>
+<style>
+.search-content {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+</style>
