@@ -1,13 +1,16 @@
 <template>
+    <h1>Тестовое задание для ЭтКонс</h1>
     <link-field />
+    <date-time-picker />
 </template>
 
 <script>
 import LinkField from "./components/LinkField.vue";
+import DateTimePicker from "./components/DateTimePicker.vue";
 
 export default {
     name: "App",
-    components: { LinkField },
+    components: { LinkField, DateTimePicker },
 };
 </script>
 
@@ -20,6 +23,9 @@ export default {
     max-width: 1200px;
     margin: 0 auto;
     margin-top: 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
 }
 
 .pi {
