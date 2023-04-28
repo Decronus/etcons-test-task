@@ -1,10 +1,13 @@
 <template>
-    <div class="link-field-wrap">
+    <div class="datetime-picker-wrap">
         <h3>DateTime Picker</h3>
 
-        <div class="link-field-inputs-wrap">
+        <div class="datetime-picker-content">
             <Calendar v-model="date" showIcon timeOnly />
-            <p>Значение v-model для времени: {{ formatDate(date) }}</p>
+            <p>
+                Значение v-model для времени:
+                {{ formatDate(date) }}
+            </p>
         </div>
     </div>
 </template>
@@ -24,6 +27,10 @@ export default {
 
     methods: {
         formatDate(unformattedDate) {
+            if (!unformattedDate) {
+                return "не определено";
+            }
+
             const newDate = new Date(unformattedDate);
             const hours = newDate.getHours();
             let minutes = newDate.getMinutes();
