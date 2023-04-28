@@ -1,23 +1,20 @@
 # Тестовое задание для ЭтКонс
 
-## Project setup
+## Использованный стек:
 
-```
-npm install
-```
+1. Vue 3
+2. Prime Vue
+3. Axios
 
-### Compiles and hot-reloads for development
+### Инструкция по установке
 
-```
-npm run serve
-```
+1. Скопировать проект из репозитория командой git clone.
+2. Установить необходимые зависимости командой npm i.
+3. Запустить проект командой vue serve.
 
-### Compiles and minifies for production
+### По всем вопросам пишите автору.
 
-```
-npm run build
-```
+Контакты для связи:\
 
-### Customize configuration
-
-See [Configuration Reference](https://cli.vuejs.org/config/).
+1. al.zotin@mail.ru
+2. Telegram A_Zotin
