@@ -4,6 +4,7 @@
     <date-time-picker />
     <multi-select />
     <multiline-text />
+    <table-search />
 </template>
 
 <script>
@@ -11,10 +12,11 @@ import LinkField from "./components/LinkField.vue";
 import DateTimePicker from "./components/DateTimePicker.vue";
 import MultiSelect from "./components/MultiSelect.vue";
 import MultilineText from "./components/MultilineText.vue";
+import TableSearch from "./components/TableSearch.vue";
 
 export default {
     name: "App",
-    components: { LinkField, DateTimePicker, MultiSelect, MultilineText },
+    components: { LinkField, DateTimePicker, MultiSelect, MultilineText, TableSearch },
 };
 </script>
 

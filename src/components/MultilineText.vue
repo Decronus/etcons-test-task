@@ -2,8 +2,6 @@
     <div class="multiline-text-wrap">
         <h3>Multiline Text</h3>
 
-        <!-- <div class="multiple-text-content"> -->
-        <!-- <div class="multiple-text-content-group"> -->
         <DataTable :value="users" tableStyle="min-width: 50rem">
             <Column field="id" header="Id"></Column>
             <Column field="actions" header="Actions" style="white-space: pre-line">
@@ -12,9 +10,6 @@
             <Column field="user" header="User"></Column>
             <Column field="email" header="Email"></Column>
         </DataTable>
-
-        <!-- </div> -->
-        <!-- </div> -->
     </div>
 </template>
 
