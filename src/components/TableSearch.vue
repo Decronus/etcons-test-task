@@ -21,9 +21,10 @@
                             <div class="p-inputgroup flex-1" style="width: 80%; position: relative">
                                 <Button icon="pi pi-sliders-v" severity="success" @click="$refs.select.show()" />
                                 <MultiSelect
-                                    v-model="selectedColumns"
+                                    v-model="selectedSearchFilter"
                                     :options="columns"
                                     optionLabel="name"
+                                    :showToggleAll="false"
                                     style="width: 20%; position: absolute"
                                     id="hidden-trigger"
                                     ref="select"
@@ -53,7 +54,6 @@
                     :key="index"
                     :field="el.name"
                     :header="el.code"
-                    sortable
                 >
                 </Column>
             </DataTable>
@@ -63,22 +63,12 @@
 
 <script>
 import DataTable from "primevue/datatable";
-import Toolbar from "primevue/toolbar";
 import InputText from "primevue/inputtext";
-import InputNumber from "primevue/inputnumber";
-import Textarea from "primevue/textarea";
-import FileUpload from "primevue/fileupload";
-import Rating from "primevue/rating";
-import Dropdown from "primevue/dropdown";
-import RadioButton from "primevue/radiobutton";
 import MultiSelect from "primevue/multiselect";
-import Dialog from "primevue/dialog";
-import Tag from "primevue/tag";
 import Column from "primevue/column";
 import Button from "primevue/button";
 import { FilterMatchMode } from "primevue/api";
 import Queries from "../services/queries.service";
-import { ref } from "vue";
 
 export default {
     name: "table-search",
@@ -86,16 +76,7 @@ export default {
         DataTable,
         Column,
         Button,
-        Toolbar,
         InputText,
-        Textarea,
-        Tag,
-        FileUpload,
-        Rating,
-        Dropdown,
-        InputNumber,
-        RadioButton,
-        Dialog,
         MultiSelect,
     },
 
@@ -104,6 +85,7 @@ export default {
             fetchedData: [],
             columns: [],
             selectedColumns: [],
+            selectedSearchFilter: [],
             filters: {},
             searchValue: "",
             showDropdown: false,
@@ -116,21 +98,36 @@ export default {
                 global: { value: null, matchMode: FilterMatchMode.CONTAINS },
             };
         },
+
         onSearchClick() {
             this.filters.global.value = this.searchValue;
+        },
+
+        objectToArray(object) {
+            const fields = [];
+            for (let el of object) {
+                fields.push(el.name);
+            }
+            return fields;
+        },
+
+        generateColumnsProps(array) {
+            const keys = Object.keys(array.data[0]);
+            for (let key of keys) {
+                const column = { name: key, code: key.toLocaleUpperCase() };
+                this.columns.push(column);
+            }
         },
     },
 
     computed: {
         globalFilterFields() {
-            if (!this.selectedColumns.length) {
-                return null;
-            } else {
-                const fields = [];
-                for (let el of this.selectedColumns) {
-                    fields.push(el.name);
-                }
-                return fields;
+            if (this.selectedSearchFilter.length) {
+                return this.objectToArray(this.selectedSearchFilter);
+            }
+
+            if (this.selectedColumns.length) {
+                return this.objectToArray(this.selectedColumns);
             }
         },
     },
@@ -141,11 +138,7 @@ export default {
 
     async mounted() {
         const comments = await Queries.getComments();
-        const keys = Object.keys(comments.data[0]);
-        for (let key of keys) {
-            const column = { name: key, code: key.toLocaleUpperCase() };
-            this.columns.push(column);
-        }
+        this.generateColumnsProps(comments);
         this.fetchedData = comments.data;
     },
 };
