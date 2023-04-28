@@ -10,9 +10,9 @@
                     :options="cities"
                     optionLabel="name"
                     placeholder="Select Cities"
-                    class="w-full md:w-20rem"
+                    style="width: 100%"
                 />
-                <i class="pi pi-times" @click="clearSelect" v-if="selectedCities.length"></i>
+                <i class="pi pi-times close-icon" @click="clearSelect" v-if="selectedCities.length"></i>
             </div>
         </div>
     </div>
@@ -48,8 +48,14 @@ export default {
 
 <style>
 .multiselect-content-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    width: 600px;
+    position: relative;
+}
+
+.close-icon {
+    position: absolute;
+    top: 14px;
+    right: 50px;
+    opacity: 0.5;
 }
 </style>
