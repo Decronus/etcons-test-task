@@ -5,7 +5,7 @@
         <div class="card">
             <DataTable
                 ref="dt"
-                :value="products"
+                :value="fetchedData"
                 v-model:selection="selectedProducts"
                 dataKey="id"
                 :paginator="true"
@@ -34,20 +34,14 @@
                         </div>
                     </div>
                 </template>
-
-                <!-- <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column> -->
-                <!-- <Column field="code" header="Code" sortable style="min-width: 12rem"></Column>
-                <Column field="name" header="Name" sortable style="min-width: 16rem"></Column> -->
                 <Column
                     v-for="(el, index) in !selectedColumns.length ? columns : selectedColumns"
                     :key="index"
                     :field="el.name"
                     :header="el.code"
                     sortable
-                    style="min-width: 8rem"
                 >
                 </Column>
-                <!-- <Column field="category" header="Category" sortable style="min-width: 10rem"></Column> -->
             </DataTable>
         </div>
     </div>
@@ -92,151 +86,24 @@ export default {
 
     data() {
         return {
+            fetchedData: [],
             columns: [],
             selectedColumns: [],
             filters: {},
-            submitted: false,
-            statuses: [
-                { label: "INSTOCK", value: "instock" },
-                { label: "LOWSTOCK", value: "lowstock" },
-                { label: "OUTOFSTOCK", value: "outofstock" },
-            ],
         };
     },
 
     methods: {
-        formatCurrency(value) {
-            if (value)
-                return value.toLocaleString("en-US", {
-                    style: "currency",
-                    currency: "USD",
-                });
-            return;
-        },
-        openNew() {
-            this.product = {};
-            this.submitted = false;
-            this.productDialog = true;
-        },
-        hideDialog() {
-            this.productDialog = false;
-            this.submitted = false;
-        },
-        saveProduct() {
-            this.submitted = true;
-
-            if (this.product.name.trim()) {
-                if (this.product.id) {
-                    this.product.inventoryStatus = this.product.inventoryStatus.value
-                        ? this.product.inventoryStatus.value
-                        : this.product.inventoryStatus;
-                    this.products[this.findIndexById(this.product.id)] = this.product;
-                    this.$toast.add({
-                        severity: "success",
-                        summary: "Successful",
-                        detail: "Product Updated",
-                        life: 3000,
-                    });
-                } else {
-                    this.product.id = this.createId();
-                    this.product.code = this.createId();
-                    this.product.image = "product-placeholder.svg";
-                    this.product.inventoryStatus = this.product.inventoryStatus
-                        ? this.product.inventoryStatus.value
-                        : "INSTOCK";
-                    this.products.push(this.product);
-                    this.$toast.add({
-                        severity: "success",
-                        summary: "Successful",
-                        detail: "Product Created",
-                        life: 3000,
-                    });
-                }
-
-                this.productDialog = false;
-                this.product = {};
-            }
-        },
-        editProduct(product) {
-            this.product = { ...product };
-            this.productDialog = true;
-        },
-        confirmDeleteProduct(product) {
-            this.product = product;
-            this.deleteProductDialog = true;
-        },
-        deleteProduct() {
-            this.products = this.products.filter((val) => val.id !== this.product.id);
-            this.deleteProductDialog = false;
-            this.product = {};
-            this.$toast.add({
-                severity: "success",
-                summary: "Successful",
-                detail: "Product Deleted",
-                life: 3000,
-            });
-        },
-        findIndexById(id) {
-            let index = -1;
-            for (let i = 0; i < this.products.length; i++) {
-                if (this.products[i].id === id) {
-                    index = i;
-                    break;
-                }
-            }
-
-            return index;
-        },
-        createId() {
-            let id = "";
-            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            for (var i = 0; i < 5; i++) {
-                id += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return id;
-        },
-        exportCSV() {
-            this.$refs.dt.exportCSV();
-        },
-        confirmDeleteSelected() {
-            this.deleteProductsDialog = true;
-        },
-        deleteSelectedProducts() {
-            this.products = this.products.filter((val) => !this.selectedProducts.includes(val));
-            this.deleteProductsDialog = false;
-            this.selectedProducts = null;
-            this.$toast.add({
-                severity: "success",
-                summary: "Successful",
-                detail: "Products Deleted",
-                life: 3000,
-            });
-        },
         initFilters() {
             this.filters = {
                 global: { value: null, matchMode: FilterMatchMode.CONTAINS },
             };
         },
-        getStatusLabel(status) {
-            switch (status) {
-                case "INSTOCK":
-                    return "success";
-
-                case "LOWSTOCK":
-                    return "warning";
-
-                case "OUTOFSTOCK":
-                    return "danger";
-
-                default:
-                    return null;
-            }
-        },
     },
 
     watch: {
-        selectedColumns() {
-            console.log(this.selectedColumns);
+        filters() {
+            console.log(this.filters);
         },
     },
 
@@ -251,6 +118,7 @@ export default {
             const column = { name: key, code: key.toLocaleUpperCase() };
             this.columns.push(column);
         }
+        this.fetchedData = comments.data;
     },
 };
 </script>
