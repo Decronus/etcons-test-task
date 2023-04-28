@@ -1,6 +1,6 @@
 <template>
     <div class="multiselect-wrap">
-        <h3>DateTime Picker</h3>
+        <h3>Multiselect</h3>
 
         <div class="multiselect-content">
             <div class="multiselect-content-group">
@@ -41,12 +41,6 @@ export default {
     methods: {
         clearSelect() {
             this.selectedCities = [];
-        },
-    },
-
-    watch: {
-        selectedCities() {
-            console.log(this.selectedCities);
         },
     },
 };

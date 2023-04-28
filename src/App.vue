@@ -3,16 +3,18 @@
     <link-field />
     <date-time-picker />
     <multi-select />
+    <multiline-text />
 </template>
 
 <script>
 import LinkField from "./components/LinkField.vue";
 import DateTimePicker from "./components/DateTimePicker.vue";
 import MultiSelect from "./components/MultiSelect.vue";
+import MultilineText from "./components/MultilineText.vue";
 
 export default {
     name: "App",
-    components: { LinkField, DateTimePicker, MultiSelect },
+    components: { LinkField, DateTimePicker, MultiSelect, MultilineText },
 };
 </script>
 
