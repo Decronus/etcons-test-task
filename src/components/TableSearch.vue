@@ -130,7 +130,12 @@ export default {
     computed: {
         globalFilterFields() {
             if (this.selectedSearchFilter.length) {
-                return this.objectToArray(this.selectedSearchFilter);
+                let set = new Set([
+                    ...this.objectToArray(this.selectedSearchFilter),
+                    ...this.objectToArray(this.selectedColumns),
+                ]);
+                let mergedArray = Array.from(set);
+                return mergedArray;
             }
 
             if (this.selectedColumns.length) {
