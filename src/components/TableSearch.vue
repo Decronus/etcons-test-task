@@ -21,6 +21,7 @@
                         <div class="search-content">
                             <div class="p-inputgroup flex-1" style="width: 80%; position: relative">
                                 <Button icon="pi pi-sliders-v" severity="success" @click="$refs.select.show()" />
+
                                 <MultiSelect
                                     v-model="selectedSearchFilter"
                                     :options="columns"
@@ -38,11 +39,13 @@
                                     @keyup.enter="onSearchClick"
                                     class="search-input"
                                 />
+
                                 <i
                                     class="pi pi-times clear-search-icon"
                                     v-if="searchValue"
                                     @click="searchValue = ''"
                                 ></i>
+
                                 <Button label="Search" @click="onSearchClick" />
                             </div>
 
@@ -56,6 +59,7 @@
                         </div>
                     </div>
                 </template>
+
                 <Column
                     v-for="(el, index) in !selectedColumns.length ? columns : selectedColumns"
                     :key="index"
